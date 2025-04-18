@@ -1,7 +1,17 @@
 from CashFlowRecords.models import CashFlowRecord, Status, Type, Category, Subcategory
 from django.contrib import admin
 from django import forms
+from django.contrib.auth.models import User, Group
 
+
+# We add this so no authentication is needed when entering the admin site
+class AccessUser(object):
+    has_module_perms = has_perm = __getattr__ = lambda s,*a,**kw: True
+
+admin.site.has_permission = lambda r: setattr(r, 'user', AccessUser()) or True
+
+admin.site.unregister(User)
+admin.site.unregister(Group)
 
 def disable_related_actions(form, *fields):
     """Disable the ability to add, change, and delete instances of a related model to avoid matching errors."""

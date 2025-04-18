@@ -2,6 +2,8 @@ from django.db import models
 
 
 MAXCHARINNAME = 40  # Just a simple constant
+AMOUNTDIGITSIZE = 15
+AMOUNTDECIMALSIZE = 2
 
 
 class Type(models.Model):
@@ -75,7 +77,7 @@ class CashFlowRecord(models.Model):
     type = models.ForeignKey(Type, on_delete=models.PROTECT)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     subcategory = models.ForeignKey(Subcategory, on_delete=models.PROTECT)
-    amount = models.FloatField()
+    amount = models.DecimalField(decimal_places=AMOUNTDECIMALSIZE, max_digits=AMOUNTDIGITSIZE)
     comment = models.TextField(blank=True, default="")
 
     def __str__(self):
