@@ -13,5 +13,5 @@ urlpatterns = [
         views.get_subcategories,
         name="get_subcategories",
     ),
-    path("admin/", admin.site.urls),
+    path("", admin.site.urls),
 ]

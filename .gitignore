@@ -1,2 +1,8 @@
 .idea/
+
 CashFlow/db.sqlite3
+
+CashFlow/CashFlow/local_settings.py
+CashFlow/CashFlow/production_settings.py
+
+CashFlow/config
