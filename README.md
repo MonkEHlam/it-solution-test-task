@@ -147,7 +147,7 @@ server {
 #### 2.5.5. Миграции
 
 ```bash
-cd it-solution-test-task/CashFlow && python3 manage.py makemigrations && python3 manage.py migrate
+cd it-solution-test-task/CashFlow && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --noinput
 ```
 
 ## 3. Запуск
