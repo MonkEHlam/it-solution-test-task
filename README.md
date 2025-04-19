@@ -9,7 +9,7 @@ sudo apt update && sudo apt upgrade -y
 
 ### 1.2. Установите зависимости 
 ```bash
-sudo apt install -y git python3-pip python3-venv nginx supervisor
+sudo apt install -y git python3-pip python3-venv nginx supervisor python3-virtualenv
 ```
 ## 2. Настройка проекта
 ### 2.1. Склонируйте репозиторий
@@ -33,6 +33,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ56mgDNksTjh6p4rDl9/EdBenmmy7AgA5iQqJiuveFh
 ```bash
 git clone git@github.com:MonkEHlam/it-solution-test-task.git
 ```
+На вопрос системы отвечаем yes
 
 ### 2.2. Создание виртуального окружения
 ```bash
@@ -105,7 +106,7 @@ sudo nano /etc/supervisor/conf.d/cashflow.conf
 Введите следующее, заменяя USER на имя учетной записи пользователя:
 ```conf
 [program:CashFlow]  
-command=/home/USER/it-solution-test-task/venv/bin/gunicorn CashFlow.wsgi:application -c /home/USER.it-solution-test-task/CashFlow/config/gunicorn.conf.py  
+command=/home/USER/it-solution-test-task/venv/bin/gunicorn CashFlow.wsgi:application -c /home/USER/it-solution-test-task/CashFlow/config/gunicorn.conf.py  
 directory=/home/USER/it-solution-test-task/CashFlow  
 user=USER  
 autorestart=true  
@@ -114,8 +115,7 @@ stdout_logfile=/home/USER/it-solution-test-task/CashFlow/logs/debug.log
 ```
 
 ```bash
-sudo supervisorctl reread
-sudo supervisorctl update
+sudo supervisorctl reread && sudo supervisorctl update
 ```
 
 #### 2.4.4. Настройки nginx
@@ -147,7 +147,7 @@ server {
 #### 2.5.5. Миграции
 
 ```bash
-cd it-solution-test-task/CashFlow && python3 manage.py makemirations && python3 manage.py migrate
+cd it-solution-test-task/CashFlow && python3 manage.py makemigrations && python3 manage.py migrate
 ```
 
 ## 3. Запуск

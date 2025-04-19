@@ -3,11 +3,13 @@ from django.contrib import admin
 from django import forms
 from django.contrib.auth.models import User, Group
 
+
 # We add this so no authentication is needed when entering the admin site
 class AccessUser(object):
-    has_module_perms = has_perm = __getattr__ = lambda s,*a,**kw: True
+    has_module_perms = has_perm = __getattr__ = lambda s, *a, **kw: True
 
-admin.site.has_permission = lambda r: setattr(r, 'user', AccessUser()) or True
+
+admin.site.has_permission = lambda r: setattr(r, "user", AccessUser()) or True
 
 # We add this to remove the user/group admin in the admin site as there is no user authentication
 admin.site.unregister(User)
@@ -15,11 +17,12 @@ admin.site.unregister(Group)
 
 # Create superuser for admin use in case it doesn't exist
 try:
-    User.objects.get_by_natural_key('admin')
+    User.objects.get_by_natural_key("admin")
 except User.DoesNotExist:
-    User.objects.create_superuser('admin', 'admin@optibus.co', '123456')
+    User.objects.create_superuser("admin", "admin@optibus.co", "123456")
 except Exception:
     pass
+
 
 def disable_related_actions(form, *fields):
     """Disable the ability to add, change, and delete instances of a related model to avoid matching errors."""

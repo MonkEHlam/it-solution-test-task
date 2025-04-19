@@ -77,7 +77,9 @@ class CashFlowRecord(models.Model):
     type = models.ForeignKey(Type, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
-    amount = models.DecimalField(decimal_places=AMOUNTDECIMALSIZE, max_digits=AMOUNTDIGITSIZE)
+    amount = models.DecimalField(
+        decimal_places=AMOUNTDECIMALSIZE, max_digits=AMOUNTDIGITSIZE
+    )
     comment = models.TextField(blank=True, default="")
 
     def __str__(self):
