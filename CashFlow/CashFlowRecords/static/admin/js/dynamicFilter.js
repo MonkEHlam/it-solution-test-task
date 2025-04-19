@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         async function updateCategories() {
         const typeId = typeSelect?.value;
+        subcategorySelect.innerHTML = '<option value="">---------</option>'
 
         if (!typeId) {
             categorySelect.innerHTML = '<option value="">---------</option>';
-            subcategorySelect.innerHTML = '<option value="">---------</option>'
             return;
         }
 
