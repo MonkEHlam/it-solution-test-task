@@ -1,0 +1,133 @@
+from CashFlowRecords.models import CashFlowRecord, Status, Type, Category, Subcategory
+from django.contrib import admin
+from django import forms
+from django.contrib.auth.models import User, Group
+
+
+# We add this so no authentication is needed when entering the admin site
+class AccessUser(object):
+    has_module_perms = has_perm = __getattr__ = lambda s, *a, **kw: True
+
+
+admin.site.has_permission = lambda r: setattr(r, "user", AccessUser()) or True
+
+# We add this to remove the user/group admin in the admin site as there is no user authentication
+admin.site.unregister(User)
+admin.site.unregister(Group)
+
+# Create superuser for admin use in case it doesn't exist
+try:
+    User.objects.get_by_natural_key("admin")
+except User.DoesNotExist:
+    User.objects.create_superuser("admin", "admin@optibus.co", "123456")
+except Exception:
+    pass
+
+
+def disable_related_actions(form, *fields):
+    """Disable the ability to add, change, and delete instances of a related model to avoid matching errors."""
+    for field_name in fields:
+        if field_name in form.base_fields:
+            field = form.base_fields[field_name]
+            if hasattr(field, "widget"):
+                if hasattr(field.widget, "can_add_related"):
+                    field.widget.can_add_related = False
+                if hasattr(field.widget, "can_change_related"):
+                    field.widget.can_change_related = False
+                if hasattr(field.widget, "can_delete_related"):
+                    field.widget.can_delete_related = False
+    return form
+
+
+class CashFlowForm(forms.ModelForm):
+    """The form is needed to clean up related models to avoid matching errors."""
+
+    class Meta:
+        model = CashFlowRecord
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if "type" in self.data:
+            try:
+                type_id = int(self.data.get("type"))
+                self.fields["category"].queryset = Category.objects.filter(
+                    type_id=type_id
+                )
+            except (ValueError, TypeError):
+                pass
+        else:
+            self.fields["category"].queryset = Category.objects.none()
+
+        if "category" in self.data:
+            try:
+                category_id = int(self.data.get("category"))
+                self.fields["subcategory"].queryset = Subcategory.objects.filter(
+                    category_id=category_id
+                )
+            except (ValueError, TypeError):
+                pass
+        else:
+            self.fields["subcategory"].queryset = Subcategory.objects.none()
+
+
+@admin.register(Status)
+class StatusAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+
+@admin.register(Type)
+class TypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "type")
+    list_filter = ("type",)
+    search_fields = ("name",)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        return disable_related_actions(form, "type")
+
+
+@admin.register(Subcategory)
+class SubcategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "category", "get_type")
+    list_filter = ("category__type", "category")
+    search_fields = ("name",)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        return disable_related_actions(form, "category")
+
+    def get_type(self, obj):
+        return obj.category.type
+
+    get_type.short_description = "Type"
+
+
+@admin.register(CashFlowRecord)
+class CashFlowAdmin(admin.ModelAdmin):
+    class Media:
+        js = ("admin/js/dynamicFilter.js",)
+
+    form = CashFlowForm
+    list_display = ("datestamp", "amount", "status", "type", "category", "subcategory")
+    list_filter = ("status", "type", "category", "subcategory", "datestamp")
+    search_fields = ("comment", "amount")
+    date_hierarchy = "datestamp"
+    fieldsets = (
+        (None, {"fields": ("datestamp", "status", "type", "category", "subcategory")}),
+        ("Financial Data", {"fields": ("amount", "comment")}),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        return disable_related_actions(
+            form, "status", "type", "category", "subcategory"
+        )
