@@ -73,10 +73,10 @@ class CashFlowRecord(models.Model):
     """Represents a cash flow record."""
 
     datestamp = models.fields.DateField()
-    status = models.ForeignKey(Status, on_delete=models.PROTECT)
-    type = models.ForeignKey(Type, on_delete=models.PROTECT)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.PROTECT)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
     amount = models.DecimalField(decimal_places=AMOUNTDECIMALSIZE, max_digits=AMOUNTDIGITSIZE)
     comment = models.TextField(blank=True, default="")
 
